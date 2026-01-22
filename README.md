@@ -1,5 +1,7 @@
 # fraud\_detection/ Anti Theft Investigation\_system
 
+
+
 **Documentation**
 
 
@@ -12,7 +14,7 @@ Simple, standalone tool for compliance teams to analyze transaction data, detect
 
 Its very simple, just upload CSV files, get inference on suspicious cases and export evidence.
 
-One simple app and does everything: Analyze transaction, score each transaction(probability + riak level)- store results in postgresSQL, create investigative ready reports
+One simple app and does everything: Analyze transaction, score each transaction(probability + risk level)- store results in postgresSQL, create investigative ready reports
 
 
 
@@ -26,13 +28,15 @@ One simple app and does everything: Analyze transaction, score each transaction(
 
 
 
+
+
 **How it works**
 
--For simple prediction you into values while or batch processing you simply upload a CSV file 
+-For simple prediction you input values while on batch processing you simply upload a CSV file.
 
--The ML model scores every transaction
+-The ML model scores every transaction.
 
--Risk levels are provided from **LOW/MEDIUM/HIGH**
+-Risk levels are provided from **LOW/MEDIUM/HIGH.**
 
 
 
@@ -116,7 +120,7 @@ Table: Fraud Predictions
 
 &nbsp; "confidence": 0.92,
 
-&nbsp; "risk\_level": "CRITICAL"
+&nbsp; "risk\_level": "LOW"
 
 }
 
@@ -162,30 +166,22 @@ AUC-ROC: 0.58
 
 **Key Benefits**
 
-**-Results Stored for retraining.**
+-Results Stored for retraining.
 
-**-lesser investigation time.**
+-lesser investigation time.
 
-**-Fewer False alerts(False Positive)**
+-Fewer False alerts(False Positive)
 
-
-
-
+-Process batch transactions.
 
 
 
 
 
 
-Fraud detection system identifies suspicious transactions using machine learning models like Random Forest, Logistic Regression, and XGBoost. It processes transaction data through preprocessing, feature engineering, and model predictions to flag potential fraud. The system integrates with FastAPI for deployment.
 
-Key Components
-Data Pipeline: Ingests transaction data, cleans it (handling missing values, outliers), and engineers features like transaction amount ratios and time-based patterns.
-​
 
-ML Models: Trained on historical Bank data with scikit-learn; evaluates using metrics like precision, recall, AUC\_ROC and F1-score for imbalanced fraud data.
 
-API Layer: FastAPI endpoints serve predictions; example: POST /predict with JSON payload returns fraud probability score.
 
-USing streamlit for a simple front end.
+
 
