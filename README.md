@@ -18,7 +18,7 @@ One simple app and does everything: Analyze transaction, score each transaction(
 
 
 
-#### **What it solves** 
+### **What it solves** 
 
 -This solves too many false alerts(False Positive) by using robust Machine Learning algorithm(Random Forest and XGboost).
 
@@ -30,7 +30,7 @@ One simple app and does everything: Analyze transaction, score each transaction(
 
 
 
-#### **How it works**
+### **How it works**
 
 -For simple prediction you input values while on batch processing you simply upload a CSV file.
 
@@ -44,7 +44,7 @@ Risk level logic: "risk\_level": "HIGH" if probabilty > 0.8 else "MEDIUM" if pro
 
 
 
-#### **Database Storage (PostgreSQL)**
+### **Database Storage (PostgreSQL)**
 
 
 
@@ -68,7 +68,7 @@ Table: Fraud Predictions
 
 
 
-#### **Technology Stack**
+### **Technology Stack**
 
 **-**Programing Language(Python)
 
@@ -82,7 +82,7 @@ Table: Fraud Predictions
 
 
 
-#### **API Endpoints**
+### **API Endpoints**
 
 &nbsp;          {
 
@@ -132,7 +132,7 @@ post /predict\_batch -saves all results to postgres automatically.
 
 
 
-#### **Model Performance**
+### **Model Performance**
 
 Accuracy: 95%
 
@@ -142,7 +142,7 @@ AUC-ROC: 0.58
 
 
 
-#### **Feature Importance(TOP Features that contributed the most in model output)**
+### **Feature Importance(TOP Features that contributed the most in model output)**
 
 
 
@@ -164,7 +164,7 @@ AUC-ROC: 0.58
 
 
 
-#### **Key Benefits**
+### **Key Benefits**
 
 -Results Stored for retraining.
 
