@@ -1,15 +1,191 @@
-# fraud_detection_system
-Documentation
+# fraud\_detection/ Anti Theft Investigation\_system
+
+**Documentation**
+
+
 
 Fraud Detection System Overview
+
+
+
+Simple, standalone tool for compliance teams to analyze transaction data, detect fraud and money laundering hence generating investigation reports. 
+
+Its very simple, just upload CSV files, get inference on suspicious cases and export evidence.
+
+One simple app and does everything: Analyze transaction, score each transaction(probability + riak level)- store results in postgresSQL, create investigative ready reports
+
+
+
+**What it solves** 
+
+-This solves too many false alerts(False Positive) by using robust Machine Learning algorithm(Random Forest and XGboost).
+
+-NO manual excel and time consuming techniques.
+
+-Ready to file reports and automation.
+
+
+
+**How it works**
+
+-For simple prediction you into values while or batch processing you simply upload a CSV file 
+
+-The ML model scores every transaction
+
+-Risk levels are provided from **LOW/MEDIUM/HIGH**
+
+
+
+Risk level logic: "risk\_level": "HIGH" if probabilty > 0.8 else "MEDIUM" if probabilty > 0.3 else "LOW"
+
+
+
+**Database Storage (PostgreSQL)**
+
+
+
+Table: Fraud Predictions
+
+&nbsp;    columns:
+
+&nbsp;           'transaction\_id': Transaction\_ID,
+
+&nbsp;           'user\_id': User\_ID,
+
+&nbsp;           'transaction\_amount': Transaction\_Amount,
+
+&nbsp;           'prediction': bool(pred),
+
+&nbsp;           'probability': round(float(prob), 4),
+
+&nbsp;           'risk\_level': result\['risk\_level']
+
+&nbsp;           'created\_at': timestamp
+
+
+
+**Technology Stack**
+
+**-**Programing Language(Python)
+
+-ML: Sklearn-Random Forest Classifier (fraud detection)
+
+-Backend : FastAPI
+
+-Database: PostgreSQL
+
+-Frontend: Streamlit
+
+
+
+**API Endpoints**
+
+&nbsp;          {
+
+&nbsp;           'Transaction\_ID': T1
+
+&nbsp;           'User\_ID': 4589,
+
+&nbsp;           'Transaction\_Amount': 3000,
+
+&nbsp;           'Transaction\_Type': , 'mobile'
+
+&nbsp;           'Time\_of\_Transaction': 10,  # datetime64 format
+
+&nbsp;           'Device\_Used': \[Device\_Used],
+
+&nbsp;           'Location': \[Location], 'Boston',
+
+&nbsp;           'Previous\_Fraudulent\_Transactions': 0,
+
+&nbsp;           'Account\_Age': 20,
+
+&nbsp;           'Number\_of\_Transactions\_Last\_24H': 3,
+
+&nbsp;           'Payment\_Method': 'debit'
+
+&nbsp;           }
+
+&nbsp;            
+
+&nbsp;{
+
+&nbsp; "fraud": true,
+
+&nbsp; "probability": 0.87,
+
+&nbsp; "confidence": 0.92,
+
+&nbsp; "risk\_level": "CRITICAL"
+
+}
+
+
+
+Batch processing
+
+post /predict\_batch -saves all results to postgres automatically.
+
+
+
+**Model Performance**
+
+Accuracy: 95%
+
+F1-Score: 97% (balanced fraud/non-fraud)
+
+AUC-ROC: 0.58
+
+
+
+**Feature Importance(TOP Features that contributed the most in model output)**
+
+
+
+**Total features after preprocessing: 7797**
+
+**Top 5 Most Important Features:**
+
+                                
+
+**1                Transaction\_Amount    0.0795**
+
+**0                           User\_ID    0.0789**
+
+**3                       Account\_Age    0.0755**
+
+**4   Number\_of\_Transactions\_Last\_24H    0.0588**
+
+**2  Previous\_Fraudulent\_Transactions    0.0423**
+
+
+
+**Key Benefits**
+
+**-Results Stored for retraining.**
+
+**-lesser investigation time.**
+
+**-Fewer False alerts(False Positive)**
+
+
+
+
+
+
+
+
+
+
 Fraud detection system identifies suspicious transactions using machine learning models like Random Forest, Logistic Regression, and XGBoost. It processes transaction data through preprocessing, feature engineering, and model predictions to flag potential fraud. The system integrates with FastAPI for deployment.
 
 Key Components
 Data Pipeline: Ingests transaction data, cleans it (handling missing values, outliers), and engineers features like transaction amount ratios and time-based patterns.
 ​
 
-ML Models: Trained on historical Bank data with scikit-learn; evaluates using metrics like precision, recall, AUC_ROC and F1-score for imbalanced fraud data.
+ML Models: Trained on historical Bank data with scikit-learn; evaluates using metrics like precision, recall, AUC\_ROC and F1-score for imbalanced fraud data.
 
 API Layer: FastAPI endpoints serve predictions; example: POST /predict with JSON payload returns fraud probability score.
 
 USing streamlit for a simple front end.
+
