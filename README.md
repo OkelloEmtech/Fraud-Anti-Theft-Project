@@ -176,8 +176,13 @@ AUC-ROC: 0.58
 
 
 
+CONFUSION MATRIX
 
+<img width="1050" height="700" alt="training_confusion_matrix" src="https://github.com/user-attachments/assets/d285ced1-f078-4306-988c-b56f48f4c04d" />
 
+ui
+
+<img width="1887" height="945" alt="Screenshot 2026-01-23 102031" src="https://github.com/user-attachments/assets/f044d6f2-5dfd-4d06-a568-da1574b1277f" />
 
 
 
