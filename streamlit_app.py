@@ -2,35 +2,80 @@ import streamlit as st
 import pandas as pd
 import requests
 import plotly.express as px
+import plotly.graph_objects as go
+from datetime import datetime
 
-st.set_page_config(page_title="Fraud Detector", layout="wide")
-st.title("🔍 Fraud Detection System")
-st.markdown("**DEMO VERSION**")
+# Page configuration
+st.set_page_config(
+    page_title="Fraud Detector", 
+    page_icon="🚨", 
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-API_URL = "http://localhost:8000"  # Base URL
+# Custom CSS
+st.markdown("""
+<style>
+    .main-header {font-size: 3rem; color: #ff4444; font-weight: bold;}
+    .metric-container {padding: 1rem; border-radius: 10px;}
+    .stMetric > label {font-size: 1.2rem !important;}
+</style>
+""", unsafe_allow_html=True)
 
-# Sidebar: Single prediction (MATCHES your GET /predict)
-st.sidebar.header("🔬 Test Single Transaction")
- 
-# slectbox field name
-with st.sidebar:
-    transaction_id = st.text_input("Transaction ID")
-    user_id = st.number_input("User ID", 1000, 5000, 4174)
-    transaction_amount = st.number_input("Transaction Amount")
-    transaction_type = st.selectbox("Transaction Type", 
-                                    ["ATM Withdrawal", "Bill Payment", "POS Payment", "Online Purchase", "Bank Transfer"])
-    device = st.selectbox("Device", ["Mobile", "Tablet", "Desktop"])
-    location = st.selectbox("Location", ["San Francisco", "New York", "Chicago"])
-    prev_fraud = st.selectbox("Previous Fraud", [0, 1, 2, 3, 4])
-    account_age = st.number_input("Account Age (days)", 0, 120, 60)
-    tx_24h = st.number_input("Tx Last 24h", 0, 20, 5)
-    payment = st.selectbox("Payment Method", ["Debit Card", "Credit Card", "UPI", "Net Banking"])
-    time_of_transaction = st.slider("Time of Transaction (float)", 0.0, 24.0, 14.0)
+# Configuration
+API_URL = "http://localhost:8000"
 
+# Title and info
+st.markdown("# 🚨 **Fraud Detection System**")
+st.markdown("**Anti-Theft/Fraud Investigation System ** | *Demo Version*")
 
-   
-    if st.button("🚨 Predict"):
-        # FIXED: GET request with query params (matches your @app.get("/predict"))
+# API Health Check
+st.sidebar.title("🔌 **API Connection**")
+api_url_input = st.sidebar.text_input("FastAPI URL", value=API_URL, help="http://localhost:8000")
+test_btn = st.sidebar.button("Test Connection", use_container_width=True)
+
+if test_btn:
+    try:
+        resp = requests.get(f"{api_url_input}/health", timeout=5)
+        if resp.status_code == 200:
+            st.sidebar.success("✅ **API Connected!**")
+            st.sidebar.json(resp.json())
+        else:
+            st.sidebar.error(f"❌ **HTTP {resp.status_code}**")
+    except Exception as e:
+        st.sidebar.error(f"❌ **Connection Failed**: {str(e)}")
+
+# Single Transaction Prediction
+st.header("🎯 **Single Transaction Analysis**")
+
+# Input form
+with st.form("single_prediction", clear_on_submit=False):
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.subheader("**Transaction Details**")
+        transaction_id = st.text_input("Transaction ID")
+        user_id = st.number_input("User ID", min_value=1)
+        transaction_amount = st.number_input("Amount", min_value=0.0)
+        transaction_type = st.selectbox("Transaction Type", 
+                                      ["ATM Withdrawal", "Bill Payment", "POS Payment", "Online Purchase", "Bank Transfer"])
+    
+    with col2:
+    
+        time_of_transaction = st.slider("Time (24h format)", 0.0, 24.0, 14.0)
+        device = st.selectbox("Device", ["Mobile", "Tablet", "Desktop", "POS Terminal"])
+        location = st.text_input("Location")
+        prev_fraud = st.slider("Previous Frauds", 0, 5, 0)
+        account_age = st.number_input("Account Age (days)")
+        tx_24h = st.number_input("Transactions (24h)", 0, 50, 3)
+        payment_method = st.selectbox("Payment Method", 
+                                    ["Debit Card", "Credit Card", "Mobile Money", "Bank Transfer"])
+    
+    predict_btn = st.form_submit_button("🚨 **PREDICT FRAUD**", use_container_width=True, type="primary")
+
+# Process single prediction
+if predict_btn and transaction_id:
+    try:
         params = {
             "Transaction_ID": transaction_id,
             "User_ID": user_id,
@@ -42,72 +87,144 @@ with st.sidebar:
             "Previous_Fraudulent_Transactions": prev_fraud,
             "Account_Age": account_age,
             "Number_of_Transactions_Last_24H": tx_24h,
-            "Payment_Method": payment
+            "Payment_Method": payment_method
         }
-        try:
-            resp = requests.get(f"{API_URL}/predict", params=params)
-            result = resp.json()
-            print(result)
-            if "error" in result:
-                st.error(f"Prediction failed: {result['error']}")
-            else:
-                st.write(f"Probability: {result['probability']}")
-                st.write(f"Risk Level: {result['risk_level']}")
-                st.sidebar.metric("Fraud Probability", f"{result['probability']:.1%}")
-                if result['fraudulent']:
-                    st.sidebar.error("🚨 **FRAUD DETECTED**")
-                else:
-                    st.sidebar.success("✅ Safe Transaction")
-                st.sidebar.json(result)
-        except Exception as e:
-            st.error(f"API Error: {e}")
-            st.info("Run: `uvicorn main:app --port 8000 --reload`")
+        
+        resp = requests.get(f"{api_url_input}/predict", params=params, timeout=10)
+        result = resp.json()
+        
+        if "error" in result:
+            st.error(f"❌ **Prediction Error**: {result['error']}")
+        else:
+            # Results layout
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                prob_pct = result.get('fraud_probability', 0) * 100
+                st.metric("Fraud Probability", f"{prob_pct:.1f}%")
+            
+            with col2:
+                risk = result.get('risk_level', 'LOW')
+                risk_color = "🔴 HIGH" if risk == "HIGH" else "🟡 MEDIUM" if risk == "MEDIUM" else "🟢 LOW"
+                st.metric("Risk Level", risk_color)
+            
+            with col3:
+                status = "🚨 **FRAUD DETECTED**" if result.get('fraudulent', False) else "✅ **SAFE**"
+                st.metric("Status", status)
+            
+            # Summary
+            st.success(f"**{result.get('message', 'Analysis Complete')}**")
+            st.json(result)
+            
+            # Risk breakdown table
+            risk_factors = {
+                "High Amount": transaction_amount > 1000000,
+                "Frequent Tx": tx_24h > 20,
+                "New Account": account_age < 30,
+                "Past Fraud": prev_fraud > 0,
+                "Unknown Location": "Unknown" in location
+            }
+            
+            st.subheader("📊 **Risk Factor Analysis**")
+            risk_df = pd.DataFrame(list(risk_factors.items()), columns=["Factor", "Risky"])
+            st.dataframe(risk_df, use_container_width=True)
+            
+    except Exception as e:
+        st.error(f"❌ **API Error**: {str(e)}")
+        st.info("💡 **Start FastAPI**: `uvicorn main:app --port 8000 --reload`")
 
-# Batch prediction
-st.header("📊 Batch Analysis")
-uploaded = st.file_uploader("Upload CSV", type="csv")
-if uploaded:
-    df = pd.read_csv(uploaded)
-    if st.button("🔥 Run Batch Prediction"):
+# Batch Analysis
+st.header("📊 **Batch Analysis**")
+
+col1, col2 = st.columns([3, 1])
+with col1:
+    uploaded_file = st.file_uploader("📁 Upload CSV File", type="csv", help="Must match API field names")
+with col2:
+    st.markdown("""
+    **Required CSV columns:**
+    - Transaction_ID
+    - User_ID  
+    - Transaction_Amount
+    - Transaction_Type
+    - Time_of_Transaction
+    - Device_Used
+    - Location
+    - Previous_Fraudulent_Transactions
+    - Account_Age
+    - Number_of_Transactions_Last_24H
+    - Payment_Method
+    """)
+
+if uploaded_file:
+    df = pd.read_csv(uploaded_file)
+    
+    # Preview
+    col1, col2 = st.columns(2)
+    with col1:
+        st.dataframe(df.head(10), use_container_width=True)
+    with col2:
+        st.metric("Total Transactions", len(df))
+    
+    if st.button("🔥 **Run Batch Prediction**", type="primary", use_container_width=True):
         try:
-            # correct endpoint + Pydantic matching field names
-            resp = requests.post(f"{API_URL}/predict_batch", json=df.to_dict('records'))
+            resp = requests.post(f"{api_url_input}/predict_batch", json=df.to_dict('records'), timeout=30)
             results = resp.json()
             
-            df['fraud_pred'] = [r['fraudulent'] for r in results]
-            df['probability'] = [r['probability'] for r in results]
+            # Add predictions to dataframe
+            df['fraud_pred'] = [r.get('fraudulent', False) for r in results]
+            df['probability'] = [r.get('fraud_probability', 0) for r in results]
+            df['risk_level'] = [r.get('risk_level', 'LOW') for r in results]
             
-            col1, col2 = st.columns(2)
-            with col1:
-                st.dataframe(df[['Location', 'Payment_Method', 'probability', 'fraud_pred']].head(10))
-            with col2:
-                fig = px.scatter(df, x='Number_of_Transactions_Last_24H', y='probability',
-                               color='fraud_pred', size='Previous_Fraudulent_Transaction',
-                               title="Fraud Risk Scatter")
-                st.plotly_chart(fig)
-            
+            # Summary metrics
+            col1, col2, col3 = st.columns(3)
             fraud_rate = df['fraud_pred'].mean()
-            st.metric("Predicted Fraud Rate", f"{fraud_rate:.1%}")
-        except Exception as e:
-            st.error(f"Batch Error: {e}")
-
-  #for batch prediction saving to DB
-    
-    if st.button("💾 Save Batch to Database"):
-        try:
-        # Save results with predictions to database
-            db_df = df[['Transaction_ID', 'User_ID', 'Transaction_Amount', 'fraud_pred', 'probability']].copy()
-            db_df.columns = ['transaction_id', 'user_id', 'transaction_amount', 'prediction', 'probability']
-            db_df['risk_level'] = ['HIGH' if p > 0.7 else 'MEDIUM' if p > 0.3 else 'LOW' for p in db_df['probability']]
-        
-            # Use FastAPI to save (or direct SQL)
-            st.success("✅ Saved to database!")
-            st.dataframe(db_df)
-        except Exception as e:
-            st.error(f"Database save error: {e}")
-           
-
-
-
-    
+            high_risk_rate = (df['risk_level'] == 'HIGH').mean()
             
+            col1.metric("📈 Fraud Rate", f"{fraud_rate:.1%}")
+            col2.metric("🔴 High Risk", f"{high_risk_rate:.1%}")
+            col3.metric("💰 Avg Amount", f"UGX {df['Transaction_Amount'].mean():,.0f}")
+            
+            # Visualization
+            fig = px.scatter(
+                df, 
+                x='Transaction_Amount', 
+                y='probability',
+                color='fraud_pred',
+                size='Number_of_Transactions_Last_24H',
+                hover_data=['Transaction_ID', 'Location'],
+                title="🔍 Fraud Risk Scatter Plot",
+                color_discrete_map={True: '#ff4444', False: '#2ecc71'},
+                labels={'Transaction_Amount': 'Amount (UGX)'}
+            )
+            st.plotly_chart(fig, use_container_width=True)
+            
+            # Results table
+            st.subheader("📋 **Prediction Results**")
+            display_cols = ['Transaction_ID', 'Transaction_Amount', 'probability', 'risk_level', 'fraud_pred']
+            st.dataframe(df[display_cols], use_container_width=True)
+            
+            # Download button
+            csv = df.to_csv(index=False).encode('utf-8')
+            st.download_button(
+                label="💾 Download Results CSV",
+                data=csv,
+                file_name=f"fraud_predictions_{datetime.now().strftime('%Y%m%d_%H%M')}.csv",
+                mime="text/csv"
+            )
+            
+        except Exception as e:
+            st.error(f"❌ **Batch Error**: {str(e)}")
+            st.info("💡 Check: API running, CSV columns match, file size reasonable")
+
+# Footer
+st.markdown("---")
+st.markdown("""
+**Instructions:**
+1. Start FastAPI: `uvicorn main:app --port 8000 --reload`
+2. Test single prediction first
+3. Upload CSV for batch analysis
+4. Download results for reporting
+
+**Made for Fraud-Anti-Theft-Project** 🚀
+""")
+           
