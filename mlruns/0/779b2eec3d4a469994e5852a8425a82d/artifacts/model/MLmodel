@@ -1,0 +1,37 @@
+artifact_path: model
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.10.16
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.4.2
+is_signature_from_type_hint: false
+mlflow_version: 2.22.0
+model_size_bytes: 34486935
+model_uuid: fb03e9f48b68447b9a42b1eaef829a65
+prompts: null
+run_id: 779b2eec3d4a469994e5852a8425a82d
+signature:
+  inputs: '[{"type": "string", "name": "Transaction_ID", "required": true}, {"type":
+    "long", "name": "User_ID", "required": true}, {"type": "double", "name": "Transaction_Amount",
+    "required": true}, {"type": "string", "name": "Transaction_Type", "required":
+    true}, {"type": "datetime", "name": "Time_of_Transaction", "required": true},
+    {"type": "string", "name": "Device_Used", "required": true}, {"type": "string",
+    "name": "Location", "required": true}, {"type": "long", "name": "Previous_Fraudulent_Transactions",
+    "required": true}, {"type": "long", "name": "Account_Age", "required": true},
+    {"type": "long", "name": "Number_of_Transactions_Last_24H", "required": true},
+    {"type": "string", "name": "Payment_Method", "required": true}, {"type": "integer",
+    "name": "hour", "required": true}, {"type": "integer", "name": "day_of_week",
+    "required": true}]'
+  outputs: '[{"type": "tensor", "tensor-spec": {"dtype": "int64", "shape": [-1]}}]'
+  params: null
+type_hint_from_example: false
+utc_time_created: '2026-01-22 11:34:23.712044'

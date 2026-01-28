@@ -1,0 +1,1 @@
+LGBMClassifier(class_weight='balanced', n_estimators=150, random_state=33)

@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/David%20Okello/Desktop/MLnew/fraud%20detection%20Project/mlruns/0/746c66ff8ca94b159b8709fa3facd0f3/artifacts
+end_time: 1769081693422
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 746c66ff8ca94b159b8709fa3facd0f3
+run_name: funny-goose-684
+run_uuid: 746c66ff8ca94b159b8709fa3facd0f3
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1769081679897
+status: 3
+tags: []
+user_id: David Okello

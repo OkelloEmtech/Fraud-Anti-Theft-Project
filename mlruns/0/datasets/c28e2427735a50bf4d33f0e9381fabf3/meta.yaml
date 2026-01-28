@@ -1,0 +1,17 @@
+digest: aa9ddeef
+name: dataset
+profile: '{"num_rows": 7779, "num_elements": 101127}'
+schema: '{"mlflow_colspec": [{"type": "string", "name": "Transaction_ID", "required":
+  true}, {"type": "long", "name": "User_ID", "required": true}, {"type": "double",
+  "name": "Transaction_Amount", "required": true}, {"type": "string", "name": "Transaction_Type",
+  "required": true}, {"type": "datetime", "name": "Time_of_Transaction", "required":
+  true}, {"type": "string", "name": "Device_Used", "required": true}, {"type": "string",
+  "name": "Location", "required": true}, {"type": "long", "name": "Previous_Fraudulent_Transactions",
+  "required": true}, {"type": "long", "name": "Account_Age", "required": true}, {"type":
+  "long", "name": "Number_of_Transactions_Last_24H", "required": true}, {"type": "string",
+  "name": "Payment_Method", "required": true}, {"type": "integer", "name": "hour",
+  "required": true}, {"type": "integer", "name": "day_of_week", "required": true}]}'
+source: '{"tags": {"mlflow.user": "David Okello", "mlflow.source.name": "C:\\Users\\David
+  Okello\\miniconda3\\envs\\py310new\\lib\\site-packages\\ipykernel_launcher.py",
+  "mlflow.source.type": "LOCAL", "mlflow.source.git.commit": "de44aed7563884598a85f933711517439248eac0"}}'
+source_type: code

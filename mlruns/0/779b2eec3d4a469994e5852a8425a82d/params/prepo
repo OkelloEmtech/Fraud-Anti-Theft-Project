@@ -1,0 +1,11 @@
+ColumnTransformer(transformers=[('num', StandardScaler(),
+                                 ['User_ID', 'Transaction_Amount',
+                                  'Previous_Fraudulent_Transactions',
+                                  'Account_Age',
+                                  'Number_of_Transactions_Last_24H']),
+                                ('cat',
+                                 OneHotEncoder(drop='first',
+                                               handle_unknown='ignore'),
+                                 ['Transaction_ID', 'Transaction_Type',
+                                  'Device_Used', 'Location',
+                                  'Payment_Method'])])
